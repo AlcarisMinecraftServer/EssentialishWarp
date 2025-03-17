@@ -1,0 +1,26 @@
+name: EssentialishWarp
+version: 0.5.0
+main: jp.pgw.kosoado.EssentialishWarp
+api-version: "1.21.1"
+
+commands: 
+     warp: 
+        aliases: [wp]
+        description: warp command
+        usage: '/warp <warp_name> [<player>]'
+     setwarp:
+        aliases: [setwp]
+        description: set warp
+        usage: '/setwarp <warp_name>'
+     delwarp:
+        aliases: [delwp]
+        description: delete warp
+        usage: '/delwarp <warp_name>'
+     relwarp:
+        aliases: [relwp]
+        description: reload warp
+        usage: '/relwarp'
+        
+permissions:
+     EssentialishWarp: 
+        default: false
