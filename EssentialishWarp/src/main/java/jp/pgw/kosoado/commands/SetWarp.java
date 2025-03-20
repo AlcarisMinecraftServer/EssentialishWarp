@@ -1,35 +1,34 @@
 package jp.pgw.kosoado.commands;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import jp.pgw.kosoado.EssentialishWarp;
 import jp.pgw.kosoado.utils.YamlUtil;
 
 /**
- * setwarpコマンド
+ * setwarpコマンド<br>
+ * ワープ地点を設定する
  */
-public class SetWarp implements CommandExecutor ,Listener {
+public class SetWarp extends EWCommand implements CommandExecutor {
 	
-	private final EssentialishWarp ew ;
-	
-	//Constructor
-	public SetWarp(EssentialishWarp _ew) {
-		
-		ew = _ew;
+	/**
+	 * コンストラクタ。
+	 */
+	public SetWarp(EssentialishWarp ew) {
+		super(ew);
 	}
 	
     @Override
-    public boolean onCommand(CommandSender sender , Command cmd ,
-            String label , String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     	
     	/* 
     	 * senderがプレイヤーの場合のみ実行
@@ -42,17 +41,21 @@ public class SetWarp implements CommandExecutor ,Listener {
     		sender.sendMessage("§cワープ名は必須です。");
     		return false;
     	}
+    	if(args.length < 2) {
+    		sender.sendMessage("§cサウンド名か、サウンド無設定の「off」が必須です。");
+    		return false;
+    	}
     	
-    	if(args.length > 1) {
+    	if(args.length > 3) {
     		sender.sendMessage("§c引数が不正です。");
     		return false;
     	}
     	
+    	FileConfiguration warplistYaml = ew.getWarplistYaml();
     	String warpName = args[0];
-    	FileConfiguration warpYaml = ew.getWarpYaml();
-    	Set<String> warpNameSet = YamlUtil.getWarpNames(warpYaml);
+    	// Set<String> warpNameSet = YamlUtil.getWarpNames(warplistYaml);
     	
-    	if(warpNameSet.contains(warpName)) {
+    	if(warplistYaml.contains(warpName)) {
     		sender.sendMessage("§a" + warpName + " §cはすでに存在しています。");
     		return true;
     	}
@@ -61,6 +64,7 @@ public class SetWarp implements CommandExecutor ,Listener {
     		
     		Player player = (Player)sender;
     		Location loc = player.getLocation();
+    		
     		String world = loc.getWorld().getName();
     		double x = loc.getX();
     		double y = loc.getY();
@@ -68,20 +72,36 @@ public class SetWarp implements CommandExecutor ,Listener {
     		float yaw = loc.getYaw();
     		float pitch = loc.getPitch();
     		
-    		warpYaml.set(warpName + ".world", world);
-    		warpYaml.set(warpName + ".x", x);
-    		warpYaml.set(warpName + ".y", y);
-    		warpYaml.set(warpName + ".z", z);
-    		warpYaml.set(warpName + ".yaw", yaw);
-    		warpYaml.set(warpName + ".pitch", pitch);
+    		String sound = args[1];
+    		
+    		File warpYamlFile = null;
+    		String yamlPath = warpName + ".yml";
+    		String warpGroup = "";
+    		if(args.length == 3) {
+    			warpGroup = args[2];
+    			yamlPath = warpGroup + "/" + yamlPath;
+    		}
+    		warpYamlFile = YamlUtil.createYaml(ew.getDataFolder(), yamlPath);
+    		FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
+    		
+    		warpYaml.set(KEY_WARP_WORLD, world);
+    		warpYaml.set(KEY_WARP_X, x);
+    		warpYaml.set(KEY_WARP_Y, y);
+    		warpYaml.set(KEY_WARP_Z, z);
+    		warpYaml.set(KEY_WARP_YAW, yaw);
+    		warpYaml.set(KEY_WARP_PITCH, pitch);
+    		warpYaml.set(KEY_SOUND_ID, sound.toUpperCase());
+    		warpYaml.set(KEY_SOUND_VOLUME, 1.0);
+    		warpYaml.set(KEY_SOUND_PITCH, 1.0);
+    		
+    		ew.getWarplistYaml().set(warpName, warpGroup);
     		try {
-				warpYaml.save(ew.getYamlFile());
-				player.sendMessage("§a" + warpName + " §6をワープ地点に登録しました。");
-    		} catch (IOException e) {
+				warpYaml.save(warpYamlFile);
+				ew.getWarplistYaml().save(ew.WARPLIST_YAML_FILE);
+				sender.sendMessage("§a" + warpName + " §6をワープ地点に登録しました。");
+    		} catch(IOException e) {
 				e.printStackTrace();
-			}
-    		
-    		
+    		}
     	} else {
     		sender.sendMessage("§6プレイヤー以外の実行はできません");
     	}

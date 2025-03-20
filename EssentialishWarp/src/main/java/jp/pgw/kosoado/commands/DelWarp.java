@@ -1,30 +1,31 @@
 package jp.pgw.kosoado.commands;
 
-import java.io.IOException;
-import java.util.Set;
+import java.io.File;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Listener;
 
 import jp.pgw.kosoado.EssentialishWarp;
+import jp.pgw.kosoado.utils.StringUtil;
 import jp.pgw.kosoado.utils.YamlUtil;
 
-public class DelWarp implements CommandExecutor ,Listener {
+/**
+ * delwarpコマンド<br>
+ * 指定したワープを削除する
+ */
+public class DelWarp extends EWCommand implements CommandExecutor {
 	
-	private final EssentialishWarp ew ;
-	
-	//Constructor
-	public DelWarp(EssentialishWarp _ew) {
-		
-		ew = _ew;
+	/**
+	 * コンストラクタ。
+	 */
+	public DelWarp(EssentialishWarp ew) {
+		super(ew);
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender , Command cmd ,
-            String label , String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		/* 
 		 * ymlに指定したワープがない場合、エラー
@@ -41,22 +42,24 @@ public class DelWarp implements CommandExecutor ,Listener {
     		return false;
     	}
     	
+    	FileConfiguration warplistYaml = ew.getWarplistYaml();
     	String warpName = args[0];
-    	FileConfiguration warpYaml = ew.getWarpYaml();
-    	Set<String> warpNameSet = YamlUtil.getWarpNames(warpYaml);
+    	String yamlPath = warpName + ".yml";
+    	String warpGroup = YamlUtil.getYamlString(warplistYaml, warpName);
     	
-    	if(!warpNameSet.contains(warpName)) {
+    	if(!warplistYaml.contains(warpName)) {
     		sender.sendMessage("§a" + warpName + " §cは存在しないワープです。");
     		return true;
     	}
     	
-    	warpYaml.set(warpName, null);
-		try {
-			warpYaml.save(ew.getYamlFile());
-			sender.sendMessage("§a" + warpName + " §6を削除しました。");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    	File warpYamlFile = null; // new File(ew.getDataFolder(), "");
+    	if(!StringUtil.isNullOrEmpty(warpGroup)) {
+    		yamlPath = warpGroup + "/" + yamlPath;
+    	}
+    	warpYamlFile = new File(ew.getDataFolder(), yamlPath);
+		warpYamlFile.delete();
+		
+		sender.sendMessage("§a" + warpName + " §6を削除しました。");
 		
 		return true;
 	}

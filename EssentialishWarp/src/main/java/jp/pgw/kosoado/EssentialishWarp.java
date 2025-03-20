@@ -7,18 +7,24 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import jp.pgw.kosoado.commands.DelWarp;
-import jp.pgw.kosoado.commands.RelWarp;
+import jp.pgw.kosoado.commands.RenWarp;
 import jp.pgw.kosoado.commands.SetWarp;
+import jp.pgw.kosoado.commands.UpdWarp;
 import jp.pgw.kosoado.commands.Warp;
+import jp.pgw.kosoado.commands.WarpGroup;
+import jp.pgw.kosoado.commands.WarpList;
 import jp.pgw.kosoado.utils.YamlUtil;
 
 public class EssentialishWarp extends JavaPlugin {
 	
-	/** yamlのFileオブジェクト */
-	private File yamlFile;
+	/** ワープ一覧yamlファイル名 */
+	public final String WARPLIST_YML = "warplist.yml";
 	
-	/** yamlから読み込んだデータ */
-	private FileConfiguration warpYaml;
+	/** ワープ一覧yamlのFileオブジェクト */
+	public final File WARPLIST_YAML_FILE = YamlUtil.createYaml(getDataFolder(), WARPLIST_YML);
+	
+	/** ワープ一覧yamlオブジェクト */
+	private FileConfiguration warplistYaml;
 	
     /**
      * 起動時処理
@@ -31,13 +37,19 @@ public class EssentialishWarp extends JavaPlugin {
     		getDataFolder().mkdirs();
     	}
     	
-    	loadYaml(warpYaml);
-        
-        //ワープコマンド
-        getCommand("warp").setExecutor(new Warp(this));
-        getCommand("setwarp").setExecutor(new SetWarp(this));
-        getCommand("delwarp").setExecutor(new DelWarp(this));
-        getCommand("relwarp").setExecutor(new RelWarp(this));
+    	loadYaml();
+    	
+    	// コマンド
+    	Warp warpCmd = new Warp(this);
+    	getCommand("warp").setExecutor(warpCmd);
+    	getCommand("silwarp").setExecutor(warpCmd);
+    	getCommand("setwarp").setExecutor(new SetWarp(this));
+    	getCommand("updwarp").setExecutor(new UpdWarp(this));
+    	getCommand("renwarp").setExecutor(new RenWarp(this));
+    	getCommand("delwarp").setExecutor(new DelWarp(this));
+    	getCommand("warplist").setExecutor(new WarpList(this));
+    	getCommand("warpgroup").setExecutor(new WarpGroup(this));
+
          
         getLogger().info("こんちくわーぷ(◎∀◎)");
     }
@@ -51,38 +63,26 @@ public class EssentialishWarp extends JavaPlugin {
     }
     
     /**
-     * ymlを読み込む
+     * ymlを読み込む<br>
+     * ①commands.yml -> jar内デフォルト値(コマンド)<br>
+     * ②warplist.yml -> ワープ一覧<br>
+     * TODO
      */
-    private void loadYaml(FileConfiguration warpYaml) {
-    	this.yamlFile = YamlUtil.createYaml(getDataFolder());
-    	this.warpYaml = YamlConfiguration.loadConfiguration(yamlFile);
+    private void loadYaml() {
+    	this.warplistYaml = YamlConfiguration.loadConfiguration(WARPLIST_YAML_FILE);
     }
     
     /**
-     * warp yamlを取得する
+     * warplist yamlを取得する
      */
-    public FileConfiguration getWarpYaml() {
-    	return this.warpYaml;
+    public FileConfiguration getWarplistYaml() {
+    	return this.warplistYaml;
     }
     
     /**
-     * warp yamlを設定する
+     * warplist yamlを設定する
      */
-    public void setWarpYaml(FileConfiguration warpYaml) {
-    	this.warpYaml = warpYaml;
-    }
-    
-    /**
-     * yamlファイルオブジェクトを取得する
-     */
-    public File getYamlFile() {
-    	return this.yamlFile;
-    }
-    
-    /**
-     * yamlファイルオブジェクトを設定する
-     */
-    public void setYamlFile(File yamlFile) {
-    	this.yamlFile = yamlFile;
+    public void setWarplistYaml(FileConfiguration warplistYaml) {
+    	this.warplistYaml = warplistYaml;
     }
 }
