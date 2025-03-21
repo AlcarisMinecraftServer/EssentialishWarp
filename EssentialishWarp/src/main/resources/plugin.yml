@@ -1,5 +1,5 @@
 name: EssentialishWarp
-version: 0.6.3
+version: 0.7.0
 main: jp.pgw.kosoado.EssentialishWarp
 api-version: "1.21.1"
 
@@ -19,7 +19,7 @@ commands:
      updwarp: 
        aliases: [updwp]
        description: update warp command
-       usage: '/warp <warp_name> <warp | sound> [<sound_name | off>]'
+       usage: '/updwarp <warp_name> <warp | sound> [<sound_name | off>]'
      renwarp: 
        aliases: [renwp]
        description: rename warp command

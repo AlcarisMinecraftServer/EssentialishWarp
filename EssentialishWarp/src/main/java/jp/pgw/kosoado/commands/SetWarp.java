@@ -2,11 +2,17 @@ package jp.pgw.kosoado.commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,7 +24,7 @@ import jp.pgw.kosoado.utils.YamlUtil;
  * setwarpコマンド<br>
  * ワープ地点を設定する
  */
-public class SetWarp extends EWCommand implements CommandExecutor {
+public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter {
 	
 	/**
 	 * コンストラクタ。
@@ -78,7 +84,7 @@ public class SetWarp extends EWCommand implements CommandExecutor {
     		String yamlPath = warpName + ".yml";
     		String warpGroup = "";
     		if(args.length == 3) {
-    			warpGroup = args[2];
+    			warpGroup = args[2].toLowerCase(); // 不正文字のバリデーションはいずれ検討。。
     			yamlPath = warpGroup + "/" + yamlPath;
     		}
     		warpYamlFile = YamlUtil.createYaml(ew.getDataFolder(), yamlPath);
@@ -107,4 +113,36 @@ public class SetWarp extends EWCommand implements CommandExecutor {
     	}
     	return true ;
     }
+    
+    
+    @Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		/*
+		 * setwarp <warp_name> <sound_name | off> [<group_name>]
+		 * サウンド名をEnumから取得して表示
+		 * player名を取得して表示
+		 */
+		
+		List<String> tabComplete = null;
+		
+		if(args.length == 2) {
+			Sound[] sounds = Sound.values();
+			tabComplete = Arrays.stream(sounds)
+					.map(value -> value.toString())
+					.filter(name -> name.startsWith(args[1].toUpperCase()))
+					.collect(Collectors.toList());
+			
+			tabComplete = Stream.concat(
+					Arrays.stream(sounds).map(value -> value.toString()), Stream.of("off")
+					).filter(name -> name.startsWith(args[1].toUpperCase())).sorted().toList();
+		}
+		else if(args.length == 3) {
+			File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
+			tabComplete = Arrays.stream(groupFolders)
+					.map(file -> file.getName())
+					.filter(name -> name.startsWith(args[2].toLowerCase())).toList();
+		}
+		return tabComplete;
+	}
 }
