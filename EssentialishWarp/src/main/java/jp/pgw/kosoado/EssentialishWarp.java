@@ -39,16 +39,34 @@ public class EssentialishWarp extends JavaPlugin {
     	
     	loadYaml();
     	
-    	// コマンド
-    	Warp warpCmd = new Warp(this);
-    	getCommand("warp").setExecutor(warpCmd);
-    	getCommand("silwarp").setExecutor(warpCmd);
-    	getCommand("setwarp").setExecutor(new SetWarp(this));
-    	getCommand("updwarp").setExecutor(new UpdWarp(this));
-    	getCommand("renwarp").setExecutor(new RenWarp(this));
-    	getCommand("delwarp").setExecutor(new DelWarp(this));
-    	getCommand("warplist").setExecutor(new WarpList(this));
-    	getCommand("warpgroup").setExecutor(new WarpGroup(this));
+    	// コマンドクラス
+    	Warp warp = new Warp(this);
+    	SetWarp setwarp = new SetWarp(this);
+    	UpdWarp updwarp = new UpdWarp(this);
+    	RenWarp renwarp = new RenWarp(this);
+    	DelWarp delwarp = new DelWarp(this);
+    	WarpList warplist = new WarpList(this);
+    	WarpGroup warpgroup = new WarpGroup(this);
+    	
+    	// コマンド実行
+    	getCommand("warp").setExecutor(warp);
+    	getCommand("silwarp").setExecutor(warp);
+    	getCommand("setwarp").setExecutor(setwarp);
+    	getCommand("updwarp").setExecutor(updwarp);
+    	getCommand("renwarp").setExecutor(renwarp);
+    	getCommand("delwarp").setExecutor(delwarp);
+    	getCommand("warplist").setExecutor(warplist);
+    	getCommand("warpgroup").setExecutor(warpgroup);
+    	
+    	// タブコンプリート
+    	getCommand("warp").setTabCompleter(warp);
+    	getCommand("silwarp").setTabCompleter(warp);
+    	// getCommand("setwarp").setTabCompleter(setwarp);
+    	// getCommand("updwarp").setTabCompleter(updwarp);
+    	// getCommand("renwarp").setTabCompleter(renwarp);
+    	// getCommand("delwarp").setTabCompleter(delwarp);
+    	// getCommand("warplist").setTabCompleter(warplist);
+    	// getCommand("warpgroup").setTabCompleter(warpgroup);
 
          
         getLogger().info("こんちくわーぷ(◎∀◎)");

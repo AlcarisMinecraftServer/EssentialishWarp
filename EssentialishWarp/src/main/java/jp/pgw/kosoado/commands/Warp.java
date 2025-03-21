@@ -1,6 +1,9 @@
 package jp.pgw.kosoado.commands;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,8 +28,8 @@ import jp.pgw.kosoado.utils.YamlUtil;
  * ②silwarpコマンド<br>
  * 自分または指定したプレイヤーをワープ音なしでワープする<br>
  */
-public class Warp extends EWCommand implements CommandExecutor {
-	
+public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
+
 	/**
 	 * コンストラクタ。
 	 */
@@ -126,4 +130,34 @@ public class Warp extends EWCommand implements CommandExecutor {
     	}
     	return true;
     }
+
+    
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		/*
+		 * warp <warp_name> [<player>]
+		 * ワープ名をyamlから取得して表示
+		 * player名を取得して表示
+		 */
+		
+		List<String> tabComplete = null;
+		
+		if(args.length == 1) {
+			Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
+			tabComplete = warpNameSet.stream()
+					.sorted()
+					.filter(name -> name.startsWith(args[0].toLowerCase())).toList();
+		}
+		else if(args.length == 2) {
+			List<String> playerList = new ArrayList<>();
+			for(Player player : Bukkit.getOnlinePlayers()) {
+				playerList.add(player.getName());
+			}
+			tabComplete = playerList.stream()
+					.sorted()
+					.filter(name -> name.startsWith(args[1])).toList();
+		}
+		return tabComplete;
+	}
 }
