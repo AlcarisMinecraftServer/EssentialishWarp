@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import jp.pgw.kosoado.EssentialishWarp;
@@ -18,7 +20,7 @@ import jp.pgw.kosoado.utils.YamlUtil;
  * warplistコマンド<br>
  * ワープ一覧やグループ一覧を表示する
  */
-public class WarpList extends EWCommand implements CommandExecutor {
+public class WarpList extends EWCommand implements CommandExecutor, TabCompleter {
 
 	/**
 	 * コンストラクタ。
@@ -75,6 +77,27 @@ public class WarpList extends EWCommand implements CommandExecutor {
 		sender.sendMessage(createWarplistString(warplist, group));
 		return true;
 	}
+	
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		/*
+		 * warplist [<reload | group_name>]
+		 * グループ名を取得して表示
+		 */
+		
+		List<String> tabComplete = null;
+		
+		if(args.length == 1) {
+			File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
+			tabComplete = Stream.concat(
+					Arrays.stream(groupFolders).map(file -> file.getName()), Stream.of("reload")
+					).filter(name -> name.startsWith(args[0].toUpperCase())).sorted().toList();
+		}
+		return tabComplete;
+	}
+	
 	
 	/**
 	 * warplist.ymlをリロードする

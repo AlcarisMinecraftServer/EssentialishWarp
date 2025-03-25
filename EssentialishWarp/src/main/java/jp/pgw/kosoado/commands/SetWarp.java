@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
@@ -131,7 +130,7 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
 			tabComplete = Arrays.stream(sounds)
 					.map(value -> value.toString())
 					.filter(name -> name.startsWith(args[1].toUpperCase()))
-					.collect(Collectors.toList());
+					.toList();
 			
 			tabComplete = Stream.concat(
 					Arrays.stream(sounds).map(value -> value.toString()), Stream.of("off")
