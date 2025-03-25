@@ -44,16 +44,16 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	
     	if(args.length == 0) {
     		sender.sendMessage("§cワープ名は必須です。\n" + cmd.getUsage());
-    		return false;
+    		return true;
     	}
     	if(args.length < 2) {
     		sender.sendMessage("§cサウンド名か、サウンド無設定の「off」が必須です。\n" + cmd.getUsage());
-    		return false;
+    		return true;
     	}
     	
     	if(args.length > 3) {
     		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
-    		return false;
+    		return true;
     	}
     	
     	FileConfiguration warplistYaml = ew.getWarplistYaml();
@@ -110,7 +110,7 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	} else {
     		sender.sendMessage("§6プレイヤー以外の実行はできません");
     	}
-    	return true ;
+    	return true;
     }
     
     
@@ -133,7 +133,7 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
 					.toList();
 			
 			tabComplete = Stream.concat(
-					Arrays.stream(sounds).map(value -> value.toString()), Stream.of("off")
+					Arrays.stream(sounds).map(value -> value.toString()), Stream.of("OFF")
 					).filter(name -> name.startsWith(args[1].toUpperCase())).sorted().toList();
 		}
 		else if(args.length == 3) {

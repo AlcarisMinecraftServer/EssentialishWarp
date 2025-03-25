@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -103,10 +105,11 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 	 * warplist.ymlをリロードする
 	 * @param sender コマンド送信者(メッセージ送信用)
 	 */
-	private void reload(CommandSender sender) {
+	private void reload(@Nullable CommandSender sender) {
 		ew.setWarplistYaml(YamlConfiguration.loadConfiguration(ew.WARPLIST_YAML_FILE));
 		sender.sendMessage("§6ワープリストをリロードしました。");
 	}
+	
 
 	
 	/**
@@ -123,9 +126,9 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 			msg.append(group);
 			msg.append("§6」の");
 		}
-		msg.append("§6warp一覧(");
+		msg.append("§6warp一覧(§b");
 		msg.append(warpCount);
-		msg.append("): ");
+		msg.append("§6): \n");
 		for(int i = 0; i < warpCount; i++) {
 			
 			if(i > 0) {

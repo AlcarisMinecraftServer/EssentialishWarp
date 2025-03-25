@@ -1,6 +1,7 @@
 package jp.pgw.kosoado.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -37,12 +38,12 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
 		
 		if(args.length == 0) {
     		sender.sendMessage("§cワープ名は必須です。\n" + cmd.getUsage());
-    		return false;
+    		return true;
     	}
     	
     	if(args.length > 1) {
     		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
-    		return false;
+    		return true;
     	}
     	
     	FileConfiguration warplistYaml = ew.getWarplistYaml();
@@ -55,15 +56,19 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
     		return true;
     	}
     	
-    	File warpYamlFile = null; // new File(ew.getDataFolder(), "");
     	if(!StringUtil.isNullOrEmpty(warpGroup)) {
     		yamlPath = warpGroup + "/" + yamlPath;
     	}
-    	warpYamlFile = new File(ew.getDataFolder(), yamlPath);
+    	File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
 		warpYamlFile.delete();
 		
-		sender.sendMessage("§a" + warpName + " §6を削除しました。");
-		
+		warplistYaml.set(warpName, null);
+		try {
+			warplistYaml.save(ew.WARPLIST_YAML_FILE);
+			sender.sendMessage("§a" + warpName + " §6を削除しました。");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	
