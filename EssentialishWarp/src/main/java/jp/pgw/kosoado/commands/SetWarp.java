@@ -44,16 +44,16 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	 */
     	
     	if(args.length == 0) {
-    		sender.sendMessage("§cワープ名は必須です。");
+    		sender.sendMessage("§cワープ名は必須です。\n" + cmd.getUsage());
     		return false;
     	}
     	if(args.length < 2) {
-    		sender.sendMessage("§cサウンド名か、サウンド無設定の「off」が必須です。");
+    		sender.sendMessage("§cサウンド名か、サウンド無設定の「off」が必須です。\n" + cmd.getUsage());
     		return false;
     	}
     	
     	if(args.length > 3) {
-    		sender.sendMessage("§c引数が不正です。");
+    		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
     		return false;
     	}
     	

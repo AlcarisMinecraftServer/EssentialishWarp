@@ -120,8 +120,7 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
         	}
         	
     	} catch(NullPointerException | IllegalArgumentException e) {
-    		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。\n" 
-    	+ cmd.getUsage());
+    		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。");
     		
     		e.printStackTrace();
     		return true;

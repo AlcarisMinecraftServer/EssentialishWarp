@@ -57,6 +57,7 @@ public class EssentialishWarp extends JavaPlugin {
     	getCommand("delwarp").setExecutor(delwarp);
     	getCommand("warplist").setExecutor(warplist);
     	getCommand("warpgroup").setExecutor(warpgroup);
+    	getCommand("relwarp").setExecutor(warplist);
     	
     	// タブコンプリート
     	getCommand("warp").setTabCompleter(warp);

@@ -3,37 +3,26 @@ package jp.pgw.kosoado.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Listener;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import jp.pgw.kosoado.EssentialishWarp;
 
 /**
  * relwarpコマンド<br>
- * yamlファイルをリロードする<br>
- * エラー発生&廃止予定コマンドのため使用禁止
- * @deprecated
+ * warplist.yamlファイルをリロードする<br>
  */
-public class RelWarp implements CommandExecutor ,Listener {
-	
-	private final EssentialishWarp ew ;
-	
-	//Constructor
+public class RelWarp extends EWCommand implements CommandExecutor {
+
+	/**
+	 * コンストラクタ。
+	 */
 	public RelWarp(EssentialishWarp ew) {
-		
-		this.ew = ew;
+		super(ew);
 	}
 	
-	public boolean onCommand(CommandSender sender , Command cmd ,
-            String label , String[] args) {
-    	
-    	// relwarpコマンド
-		/*
-		ew.setYamlFile(YamlUtil.createYaml(ew.getDataFolder()));
-    	ew.setWarpYaml(YamlConfiguration.loadConfiguration(ew.getYamlFile()));
-    	sender.sendMessage("§6ワープデータをリロードしました。");
-		 */
-		
-    	
-    	return true ;
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		ew.setWarplistYaml(YamlConfiguration.loadConfiguration(ew.WARPLIST_YAML_FILE));
+    	return true;
     }
 }

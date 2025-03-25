@@ -36,12 +36,12 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	 */
 		
 		if(args.length == 0) {
-    		sender.sendMessage("§cワープ名は必須です。");
+    		sender.sendMessage("§cワープ名は必須です。\n" + cmd.getUsage());
     		return false;
     	}
     	
     	if(args.length > 1) {
-    		sender.sendMessage("§c引数が不正です。");
+    		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
     		return false;
     	}
     	

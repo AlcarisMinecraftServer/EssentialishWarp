@@ -1,5 +1,5 @@
 name: EssentialishWarp
-version: 0.7.0
+version: 0.8.0
 main: jp.pgw.kosoado.EssentialishWarp
 api-version: "1.21.1"
 
@@ -31,11 +31,15 @@ commands:
      warplist:
        aliases: [wplist]
        description: warp list
-       usage: '/warplist [<group_name>]'
+       usage: '/warplist [<reload | group_name>]'
      warpgroup:
        aliases: [wpgp]
        description: warp group operation
        usage: '/warpgroup <operation> <name> [<value>]'
+     relwarp: 
+       aliases: [relwp]
+       description: reload warplist
+       usage: '/renwarp <warp_name> <new_warp_name>'
         
 permissions:
      EssentialishWarp: 
