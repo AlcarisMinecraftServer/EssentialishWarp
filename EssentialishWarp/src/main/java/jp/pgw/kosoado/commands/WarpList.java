@@ -107,7 +107,7 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 	 */
 	private void reload(@Nullable CommandSender sender) {
 		ew.setWarplistYaml(YamlConfiguration.loadConfiguration(ew.WARPLIST_YAML_FILE));
-		sender.sendMessage("§6ワープリストをリロードしました。");
+		sender.sendMessage("§6ワープ一覧をリロードしました。");
 	}
 	
 

@@ -41,8 +41,12 @@ public class YamlUtil {
 	 * グループフォルダがなければ、作成する<br>
 	 * yamlファイルがないとき、作成する<br>
 	 * yamlのFileオブジェクトを生成して返す
+	 * @param dataFolder プラグインデータフォルダのFileオブジェクト
+	 * @param fileName 作成するファイル名(ワープ名)
+	 * 
+	 * @throws IOException 呼び出し側でエラーメッセージを出力する
 	 */
-	public static File createYaml(File dataFolder, String fileName) {
+	public static File createYaml(File dataFolder, String fileName) throws IOException {
 
 		if(fileName.contains("/")) {
 			String group = fileName.split("/")[0];
@@ -59,7 +63,8 @@ public class YamlUtil {
     			yaml.createNewFile();
     			
     		}catch(IOException e) {
-    			e.printStackTrace();
+    			// 呼び出し側でエラーメッセージを出す
+    			throw e;
     		}
     	}
 		

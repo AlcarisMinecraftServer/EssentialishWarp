@@ -1,6 +1,7 @@
 package jp.pgw.kosoado;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,10 +22,38 @@ public class EssentialishWarp extends JavaPlugin {
 	public final String WARPLIST_YML = "warplist.yml";
 	
 	/** ワープ一覧yamlのFileオブジェクト */
-	public final File WARPLIST_YAML_FILE = YamlUtil.createYaml(getDataFolder(), WARPLIST_YML);
+	public final File WARPLIST_YAML_FILE;
 	
 	/** ワープ一覧yamlオブジェクト */
 	private FileConfiguration warplistYaml;
+	
+	
+	/**
+	 * コンストラクタ。<br>
+	 * 初期データを設定する。
+	 */
+	public EssentialishWarp() {
+		
+		// データフォルダがなければ作成
+		File dataFolder = getDataFolder();
+    	if(!dataFolder.exists()) {
+    		dataFolder.mkdirs();
+    	}
+    	
+    	File warplistYamlFile = null;
+    	try {
+    		warplistYamlFile = YamlUtil.createYaml(dataFolder, WARPLIST_YML);
+		}
+    	catch(IOException e) {
+			getLogger().severe("ワープリストを生成できませんでした。");
+			e.printStackTrace();
+			getServer().getPluginManager().disablePlugin(this);
+		}
+    	finally {
+    		WARPLIST_YAML_FILE = warplistYamlFile;
+    	}
+	}
+	
 	
     /**
      * 起動時処理
@@ -32,11 +61,13 @@ public class EssentialishWarp extends JavaPlugin {
     @Override
     public void onEnable() {
     	
-    	// データフォルダがなければ作成
-    	if(!getDataFolder().exists()) {
-    		getDataFolder().mkdirs();
+    	// ワープ一覧生成に失敗した場合、プラグインを無効化する
+    	if(WARPLIST_YAML_FILE == null) {
+    		getLogger().severe("ワープ一覧を生成できませんでした。寝ます。");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
     	}
-    	
+ 
     	loadYaml();
     	
     	// コマンドクラス
@@ -82,13 +113,11 @@ public class EssentialishWarp extends JavaPlugin {
     }
     
     /**
-     * ymlを読み込む<br>
-     * ①commands.yml -> jar内デフォルト値(コマンド)<br>
-     * ②warplist.yml -> ワープ一覧<br>
-     * TODO
+     * warplist.ymlを読み込む
      */
     private void loadYaml() {
     	this.warplistYaml = YamlConfiguration.loadConfiguration(WARPLIST_YAML_FILE);
+    	getLogger().info("ワープ一覧をロードしました。");
     }
     
     /**

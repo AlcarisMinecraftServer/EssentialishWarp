@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import jp.pgw.kosoado.EssentialishWarp;
 import jp.pgw.kosoado.exceptions.SoundNotFoundException;
 import jp.pgw.kosoado.utils.YamlUtil;
+import jp.pgw.kosoado.validations.ForbiddenChars;
+import jp.pgw.kosoado.validations.ReservedChars;
 
 /**
  * コマンドの基本クラス
@@ -80,5 +82,14 @@ public class EWCommand {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	/**
+	 * 文字列に禁則文字・予約文字チェックを行う<br>
+	 * 文字列に問題がなければ、trueを返す
+	 */
+	protected boolean validate(String s) {
+		return !ForbiddenChars.containsForbiddenChars(s) && !ReservedChars.isReservedChar(s);
 	}
 }

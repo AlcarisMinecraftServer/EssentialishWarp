@@ -47,7 +47,7 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     		return true;
     	}
     	if(args.length < 2) {
-    		sender.sendMessage("§cサウンド名か、サウンド無設定の「off」が必須です。\n" + cmd.getUsage());
+    		sender.sendMessage("§cサウンド名か、サウンド無設定の「OFF」が必須です。\n" + cmd.getUsage());
     		return true;
     	}
     	
@@ -57,9 +57,15 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	}
     	
     	FileConfiguration warplistYaml = ew.getWarplistYaml();
-    	String warpName = args[0];
-    	// Set<String> warpNameSet = YamlUtil.getWarpNames(warplistYaml);
+    	String warpName = args[0].toLowerCase();
     	
+    	// 不正文字チェック
+    	if(!validate(warpName)) {
+    		sender.sendMessage("§cワープ名に使えない文字・単語が含まれています。");
+    		return true;
+    	}
+    	
+    	// 既存ワープチェック
     	if(warplistYaml.contains(warpName)) {
     		sender.sendMessage("§a" + warpName + " §cはすでに存在しています。");
     		return true;
@@ -83,10 +89,17 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     		String yamlPath = warpName + ".yml";
     		String warpGroup = "";
     		if(args.length == 3) {
-    			warpGroup = args[2].toLowerCase(); // 不正文字のバリデーションはいずれ検討。。
+    			warpGroup = args[2].toLowerCase(); // TODO 不正文字のバリデーション
     			yamlPath = warpGroup + "/" + yamlPath;
     		}
-    		warpYamlFile = YamlUtil.createYaml(ew.getDataFolder(), yamlPath);
+    		try {
+    			warpYamlFile = YamlUtil.createYaml(ew.getDataFolder(), yamlPath);
+    		}
+    		catch(IOException e) {
+    			e.printStackTrace();
+    			sender.sendMessage("§cワープが正常に登録されませんでした。");
+    			return true;
+    		}
     		FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
     		
     		warpYaml.set(KEY_WARP_WORLD, world);

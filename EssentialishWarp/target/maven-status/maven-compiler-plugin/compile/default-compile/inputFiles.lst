@@ -10,3 +10,5 @@ C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\koso
 C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\kosoado\exceptions\SoundNotFoundException.java
 C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\kosoado\utils\StringUtil.java
 C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\kosoado\utils\YamlUtil.java
+C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\kosoado\validations\ForbiddenChars.java
+C:\Users\Tomoggu\git\EssentialishWarp\EssentialishWarp\src\main\java\jp\pgw\kosoado\validations\ReservedChars.java
