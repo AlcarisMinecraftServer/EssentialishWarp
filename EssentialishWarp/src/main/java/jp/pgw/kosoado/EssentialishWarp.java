@@ -83,7 +83,7 @@ public class EssentialishWarp extends JavaPlugin {
     	getCommand("warp").setExecutor(warp);
     	getCommand("silwarp").setExecutor(warp);
     	getCommand("setwarp").setExecutor(setwarp);
-    	getCommand("updwarp").setExecutor(updwarp); // TODO updwarp
+    	getCommand("updwarp").setExecutor(updwarp);
     	getCommand("renwarp").setExecutor(renwarp); // TODO renwarp
     	getCommand("delwarp").setExecutor(delwarp);
     	getCommand("warplist").setExecutor(warplist);
@@ -94,7 +94,7 @@ public class EssentialishWarp extends JavaPlugin {
     	getCommand("warp").setTabCompleter(warp);
     	getCommand("silwarp").setTabCompleter(warp);
     	getCommand("setwarp").setTabCompleter(setwarp);
-    	// getCommand("updwarp").setTabCompleter(updwarp);
+    	getCommand("updwarp").setTabCompleter(updwarp);
     	// getCommand("renwarp").setTabCompleter(renwarp);
     	getCommand("delwarp").setTabCompleter(delwarp);
     	getCommand("warplist").setTabCompleter(warplist);

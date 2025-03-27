@@ -39,6 +39,7 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 		 * コマンドがwarplistの場合
 		 * 引数なしならwarplistを表示
 		 * 引数がreloadならリロード
+		 * 引数が「-」ならグループなしのワープ表示
 		 * 引数がそれ以外ならグループ絞り
 		 */
 		
@@ -49,6 +50,11 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 		}
 		
 		// warplistコマンド
+		if(args.length > 1) {
+    		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
+    		return true;
+    	}
+		
 		List<String> warplist = null;
 		String group = null;
 		
@@ -63,17 +69,14 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 				return true;
 			}
 			
-			Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
 			group = args[0];
 			File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
 			List<String> groupList = Arrays.stream(groupFolders).map(file -> file.getName()).toList();
-			if(!groupList.contains(group)) {
-	    		sender.sendMessage("§a" + group + " §cは存在しないグループです。");
-	    		return true;
-	    	}
-			warplist = warpNameSet.stream()
-					.filter(warp -> groupList.contains(YamlUtil.getYamlString(ew.getWarplistYaml(), warp)))
-					.sorted().toList();
+			if(!group.equals("-") && !groupList.contains(group)) {
+			   	sender.sendMessage("§a" + group + " §cは存在しないグループです。");
+			   	return true;
+			   }
+			warplist = createWarplist(group);
 		}
 		
 		sender.sendMessage(createWarplistString(warplist, group));
@@ -93,8 +96,9 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 		
 		if(args.length == 1) {
 			File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
+			String[] subCmds = {"reload", "-"};
 			tabComplete = Stream.concat(
-					Arrays.stream(groupFolders).map(file -> file.getName()), Stream.of("reload")
+					Arrays.stream(groupFolders).map(file -> file.getName()), Arrays.stream(subCmds)
 					).filter(name -> name.startsWith(args[0].toUpperCase())).sorted().toList();
 		}
 		return tabComplete;
@@ -111,20 +115,51 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 	}
 	
 
+	/**
+	 * ワープ一覧を作成する<br>
+	 * 入力されたグループで絞り込みを行う<br>
+	 * groupが「-」で指定されたら、グループ未指定の一覧を作成する
+	 */
+	private List<String> createWarplist(String group) {
+		
+		Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
+		if(group.equals("-")) {
+			return warpNameSet.stream()
+					.filter(warp -> {
+						String groupName = YamlUtil.getYamlString(ew.getWarplistYaml(), warp);
+						return groupName.isEmpty();
+					})
+					.sorted().toList();
+		}
+		return warpNameSet.stream()
+				.filter(warp -> {
+					String groupName = YamlUtil.getYamlString(ew.getWarplistYaml(), warp);
+					return groupName.equals(group);
+				})
+				.sorted().toList();
+	}
+	
 	
 	/**
 	 * ワープ一覧の表示する文字列を作成する
 	 */
-	private String createWarplistString(List<String> warplist, String group) {
+	private String createWarplistString(List<String> warplist, @Nullable String group) {
 		
 		int warpCount = warplist.size();
 		
 		StringBuilder msg = new StringBuilder();
 		
 		if(!StringUtil.isNullOrEmpty(group)) {
-			msg.append("§6グループ「§a");
-			msg.append(group);
-			msg.append("§6」の");
+			
+			if(group.equals("-")) {
+				msg.append("§6グループ無設定の");
+			}
+			else {
+				msg.append("§6グループ「§a");
+				msg.append(group);
+				msg.append("§6」の");
+			}
+			
 		}
 		msg.append("§6warp一覧(§b");
 		msg.append(warpCount);

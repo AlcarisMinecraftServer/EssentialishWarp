@@ -1,5 +1,13 @@
 package jp.pgw.kosoado.commands;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -89,7 +97,75 @@ public class EWCommand {
 	 * 文字列に禁則文字・予約文字チェックを行う<br>
 	 * 文字列に問題がなければ、trueを返す
 	 */
-	protected boolean validate(String s) {
-		return !ForbiddenChars.containsForbiddenChars(s) && !ReservedChars.isReservedChar(s);
+	protected boolean validate(String input) {
+		return !ForbiddenChars.containsForbiddenChars(input) && !ReservedChars.isReservedChar(input);
 	}
+	
+	
+	/**
+	 * 文字列がSoundかどうかチェックする<br>
+	 * Soundであれば、trueを返す
+	 */
+	protected boolean isSound(String input) {
+		
+		for(Sound sound : Sound.values()) {
+			
+			if(sound.toString().equalsIgnoreCase(input)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * ワープ名のタブコンプリート候補を生成する
+	 */
+	protected List<String> suggestWarps(String input) {
+		Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
+		return warpNameSet.stream()
+				.sorted()
+				.filter(name -> name.startsWith(input.toLowerCase())).toList();
+	}
+	
+	
+	/**
+	 * プレイヤー名のタブコンプリート候補を生成する
+	 */
+	protected List<String> suggestPlayers(String input) {
+		
+		List<String> playerList = new ArrayList<>();
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			playerList.add(player.getName());
+		}
+		return playerList.stream()
+				.sorted()
+				.filter(name -> name.startsWith(input)).toList();
+	}
+	
+	
+	/**
+	 * サウンド名のタブコンプリート候補を生成する
+	 */
+	protected List<String> suggestSounds(String input) {
+		
+		Sound[] sounds = Sound.values();
+		return Stream.concat(
+				Arrays.stream(sounds).map(value -> value.toString()), Stream.of("OFF")
+				).filter(name -> name.startsWith(input.toUpperCase())).sorted().toList();
+	}
+	
+	
+	/**
+	 * グループ名のタブコンプリート候補を生成する
+	 */
+	protected List<String> suggestGroups(String input) {
+		File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
+		return Arrays.stream(groupFolders)
+				.map(file -> file.getName())
+				.filter(name -> name.startsWith(input.toLowerCase())).toList();
+	}
+	
+	
+	
 }

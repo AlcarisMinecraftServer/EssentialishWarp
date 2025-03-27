@@ -1,9 +1,7 @@
 package jp.pgw.kosoado.commands;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -116,13 +114,11 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
         		if(cmd.getName().equals("warp")) {
         			playWarpSound(warpPlayer, sound);
         		}
-        		sender.sendMessage("§6" + warpPlayer + " を §a " + warpName + " §6へワープしました。");
+        		sender.sendMessage("§6" + warpPlayer.getName() + " を §a " + warpName + " §6へワープしました。");
         	}
         	
     	} catch(NullPointerException | IllegalArgumentException e) {
     		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。");
-    		
-    		e.printStackTrace();
     		return true;
     	} catch(SoundNotFoundException e) {
     		sender.sendMessage("§a指定したサウンドは存在しません。\n単語の区切りはすべてアンダーバー(_)です。");
@@ -136,27 +132,11 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
 		
 		/*
 		 * warp <warp_name> [<player>]
-		 * ワープ名をyamlから取得して表示
-		 * player名を取得して表示
 		 */
+		if(args.length == 1) return suggestWarps(args[0]);
 		
-		List<String> tabComplete = null;
+		else if(args.length == 2) return suggestPlayers(args[1]);
 		
-		if(args.length == 1) {
-			Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
-			tabComplete = warpNameSet.stream()
-					.sorted()
-					.filter(name -> name.startsWith(args[0].toLowerCase())).toList();
-		}
-		else if(args.length == 2) {
-			List<String> playerList = new ArrayList<>();
-			for(Player player : Bukkit.getOnlinePlayers()) {
-				playerList.add(player.getName());
-			}
-			tabComplete = playerList.stream()
-					.sorted()
-					.filter(name -> name.startsWith(args[1])).toList();
-		}
-		return tabComplete;
+		return null;
 	}
 }

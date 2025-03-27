@@ -3,7 +3,6 @@ package jp.pgw.kosoado.commands;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -78,17 +77,9 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
 		
 		/*
 		 * delwarp <warp_name>
-		 * ワープ名をyamlから取得して表示
 		 */
+		if(args.length == 1) return suggestWarps(args[0]);
 		
-		List<String> tabComplete = null;
-		
-		if(args.length == 1) {
-			Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
-			tabComplete = warpNameSet.stream()
-					.sorted()
-					.filter(name -> name.startsWith(args[0].toLowerCase())).toList();
-		}
-		return tabComplete;
+		return null;
 	}
 }
