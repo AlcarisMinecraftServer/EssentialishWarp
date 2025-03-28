@@ -75,6 +75,7 @@ public class UpdWarp extends EWCommand implements CommandExecutor, TabCompleter 
         		}
         		
         		String warpGroup = YamlUtil.getYamlString(warplistYaml, warpName);
+        		String yamlPath = createPathString(warpName, warpGroup);
         		
         		Player player = (Player)sender;
         		Location loc = player.getLocation();
@@ -87,7 +88,7 @@ public class UpdWarp extends EWCommand implements CommandExecutor, TabCompleter 
         		float pitch = loc.getPitch();
 
         		try {
-        			File warpYamlFile = new File(ew.getDataFolder(), warpGroup + "/" + warpName + ".yml");
+        			File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
         			FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
         			
         			warpYaml.set(KEY_WARP_WORLD, world);
@@ -128,9 +129,10 @@ public class UpdWarp extends EWCommand implements CommandExecutor, TabCompleter 
             	}
         		
         		String warpGroup = YamlUtil.getYamlString(warplistYaml, warpName);
+        		String yamlPath = createPathString(warpName, warpGroup);
         		
         		try {
-        			File warpYamlFile = new File(ew.getDataFolder(), warpGroup + "/" + warpName + ".yml");
+        			File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
         			FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
         			
             		warpYaml.set(KEY_SOUND_ID, args[2].toUpperCase());
@@ -169,15 +171,14 @@ public class UpdWarp extends EWCommand implements CommandExecutor, TabCompleter 
 		 */
 		if(args.length == 1) return suggestWarps(args[0]);
 		
-		else if(args.length == 2) {
-			List<String> operations = new ArrayList<>();
-			operations.add("sound");
-			operations.add("warp");
-			return operations;
+		List<String> tabComplete = new ArrayList<>();
+		if(args.length == 2) {
+			tabComplete.add("sound");
+			tabComplete.add("warp");
+			return tabComplete;
 		}
-		else if(args.length == 3 && !args[1].equals("warp")) return suggestSounds(args[2]);
-		
-		return null;
+		if(args.length == 3 && !args[1].equals("warp")) return suggestSounds(args[2]);
+		return tabComplete;
 	}
 	
 	

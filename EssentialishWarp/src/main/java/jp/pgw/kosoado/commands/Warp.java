@@ -1,6 +1,7 @@
 package jp.pgw.kosoado.commands;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -63,12 +64,8 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
     	FileConfiguration warplistYaml = ew.getWarplistYaml();
     	String warpName = args[0];
     	String warpGroup = warplistYaml.getString(warpName);
-    	if(warpGroup == null) {
-    		warpGroup = "";
-    	}
-    	
-    	String yamlPath = warpGroup.isEmpty() ? "" : warpGroup + "/";
-    	File warpYamlFile = new File(ew.getDataFolder(), yamlPath + warpName + ".yml");
+    	String yamlPath = createPathString(warpName, warpGroup);
+    	File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
     	
     	try {
     		FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
@@ -110,7 +107,6 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
         	
         	}else {
         		warpPlayer.teleport(warpLoc);
-        		// warpPlayer.sendMessage("§a" + warpName + " §6へワープしました。");
         		if(cmd.getName().equals("warp")) {
         			playWarpSound(warpPlayer, sound);
         		}
@@ -119,6 +115,7 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
         	
     	} catch(NullPointerException | IllegalArgumentException e) {
     		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。");
+    		e.printStackTrace();
     		return true;
     	} catch(SoundNotFoundException e) {
     		sender.sendMessage("§a指定したサウンドは存在しません。\n単語の区切りはすべてアンダーバー(_)です。");
@@ -134,9 +131,7 @@ public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
 		 * warp <warp_name> [<player>]
 		 */
 		if(args.length == 1) return suggestWarps(args[0]);
-		
-		else if(args.length == 2) return suggestPlayers(args[1]);
-		
-		return null;
+		if(args.length == 2) return suggestPlayers(args[1]);
+		return new ArrayList<>();
 	}
 }

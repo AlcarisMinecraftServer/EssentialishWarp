@@ -2,6 +2,7 @@ package jp.pgw.kosoado.commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -87,7 +88,6 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     		float pitch = loc.getPitch();
     		
     		File warpYamlFile = null;
-    		String yamlPath = warpName + ".yml";
     		String warpGroup = "";
     		if(args.length == 3) {
     			warpGroup = args[2].toLowerCase();
@@ -97,9 +97,9 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
     				sender.sendMessage("§cグループ名に使えない文字・単語が含まれています。");
     	    		return true;
     			}
-    			
-    			yamlPath = warpGroup + "/" + yamlPath;
     		}
+    		String yamlPath = createPathString(warpName, warpGroup);
+    		
     		try {
     			warpYamlFile = YamlUtil.createYaml(ew.getDataFolder(), yamlPath);
     		}
@@ -145,9 +145,7 @@ public class SetWarp extends EWCommand implements CommandExecutor, TabCompleter 
 		 * setwarp <warp_name> <sound_name | off> [<group_name>]
 		 */
 		if(args.length == 2) return suggestSounds(args[1]);
-		
-		else if(args.length == 3) return suggestGroups(args[2]);
-		
-		return null;
+		if(args.length == 3) return suggestGroups(args[2]);
+		return new ArrayList<>();
 	}
 }

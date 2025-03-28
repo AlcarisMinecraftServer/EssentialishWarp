@@ -1,6 +1,7 @@
 package jp.pgw.kosoado.commands;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -92,16 +93,14 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 		 * グループ名を取得して表示
 		 */
 		
-		List<String> tabComplete = null;
-		
 		if(args.length == 1) {
 			File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
 			String[] subCmds = {"reload", "-"};
-			tabComplete = Stream.concat(
+			return Stream.concat(
 					Arrays.stream(groupFolders).map(file -> file.getName()), Arrays.stream(subCmds)
 					).filter(name -> name.startsWith(args[0].toUpperCase())).sorted().toList();
 		}
-		return tabComplete;
+		return new ArrayList<>();
 	}
 	
 	
@@ -145,8 +144,6 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 	 */
 	private String createWarplistString(List<String> warplist, @Nullable String group) {
 		
-		int warpCount = warplist.size();
-		
 		StringBuilder msg = new StringBuilder();
 		
 		if(!StringUtil.isNullOrEmpty(group)) {
@@ -161,9 +158,20 @@ public class WarpList extends EWCommand implements CommandExecutor, TabCompleter
 			}
 			
 		}
-		msg.append("§6warp一覧(§b");
+		msg.append("§6warp");
+		
+		if(warplist.isEmpty()) {
+			msg.append("は存在しません。");
+			return msg.toString();
+		}
+		
+		msg.append("一覧(§b");
+		
+		int warpCount = warplist.size();
+		
 		msg.append(warpCount);
 		msg.append("§6): \n");
+		
 		for(int i = 0; i < warpCount; i++) {
 			
 			if(i > 0) {

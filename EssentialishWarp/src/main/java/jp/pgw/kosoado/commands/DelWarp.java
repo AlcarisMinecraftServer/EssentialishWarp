@@ -2,6 +2,7 @@ package jp.pgw.kosoado.commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.command.Command;
@@ -11,7 +12,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import jp.pgw.kosoado.EssentialishWarp;
-import jp.pgw.kosoado.utils.StringUtil;
 import jp.pgw.kosoado.utils.YamlUtil;
 
 /**
@@ -47,7 +47,6 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
     	
     	FileConfiguration warplistYaml = ew.getWarplistYaml();
     	String warpName = args[0];
-    	String yamlPath = warpName + ".yml";
     	String warpGroup = YamlUtil.getYamlString(warplistYaml, warpName);
     	
     	if(!warplistYaml.contains(warpName)) {
@@ -55,9 +54,7 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
     		return true;
     	}
     	
-    	if(!StringUtil.isNullOrEmpty(warpGroup)) {
-    		yamlPath = warpGroup + "/" + yamlPath;
-    	}
+    	String yamlPath = createPathString(warpName, warpGroup);
     	File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
 		warpYamlFile.delete();
 		
@@ -67,6 +64,7 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
 			sender.sendMessage("§a" + warpName + " §6を削除しました。");
 		} catch(IOException e) {
 			e.printStackTrace();
+			sender.sendMessage(" §c予期せぬエラーが発生しました。");
 		}
 		return true;
 	}
@@ -80,6 +78,6 @@ public class DelWarp extends EWCommand implements CommandExecutor, TabCompleter 
 		 */
 		if(args.length == 1) return suggestWarps(args[0]);
 		
-		return null;
+		return new ArrayList<>();
 	}
 }

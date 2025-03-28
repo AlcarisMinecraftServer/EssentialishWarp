@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import jp.pgw.kosoado.EssentialishWarp;
 import jp.pgw.kosoado.exceptions.SoundNotFoundException;
+import jp.pgw.kosoado.utils.StringUtil;
 import jp.pgw.kosoado.utils.YamlUtil;
 import jp.pgw.kosoado.validations.ForbiddenChars;
 import jp.pgw.kosoado.validations.ReservedChars;
@@ -124,8 +125,8 @@ public class EWCommand {
 	protected List<String> suggestWarps(String input) {
 		Set<String> warpNameSet = YamlUtil.getWarpNames(ew.getWarplistYaml());
 		return warpNameSet.stream()
-				.sorted()
-				.filter(name -> name.startsWith(input.toLowerCase())).toList();
+				.filter(name -> name.startsWith(input.toLowerCase()))
+				.sorted().toList();
 	}
 	
 	
@@ -139,8 +140,8 @@ public class EWCommand {
 			playerList.add(player.getName());
 		}
 		return playerList.stream()
-				.sorted()
-				.filter(name -> name.startsWith(input)).toList();
+				.filter(name -> name.startsWith(input))
+				.sorted().toList();
 	}
 	
 	
@@ -163,9 +164,24 @@ public class EWCommand {
 		File[] groupFolders = ew.getDataFolder().listFiles(file -> file.isDirectory());
 		return Arrays.stream(groupFolders)
 				.map(file -> file.getName())
-				.filter(name -> name.startsWith(input.toLowerCase())).toList();
+				.filter(name -> name.startsWith(input.toLowerCase()))
+				.sorted().toList();
 	}
 	
 	
-	
+	/**
+	 * ワープファイルのパス文字列を作成する<br>
+	 */
+	protected String createPathString(String warp, String group) {
+
+		StringBuilder warpPath = new StringBuilder();
+    	if(!StringUtil.isNullOrEmpty(group)) {
+    		warpPath.append(group);
+    		warpPath.append("/");
+    	}
+		warpPath.append(warp);
+		warpPath.append(".yml");
+
+		return warpPath.toString();
+	}
 }
