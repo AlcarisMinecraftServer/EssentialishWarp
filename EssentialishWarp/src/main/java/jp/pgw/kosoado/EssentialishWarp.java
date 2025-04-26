@@ -45,9 +45,7 @@ public class EssentialishWarp extends JavaPlugin {
     		warplistYamlFile = YamlUtil.createYaml(dataFolder, WARPLIST_YML);
 		}
     	catch(IOException e) {
-			getLogger().severe("ワープリストを生成できませんでした。");
 			e.printStackTrace();
-			getServer().getPluginManager().disablePlugin(this);
 		}
     	finally {
     		WARPLIST_YAML_FILE = warplistYamlFile;
@@ -98,7 +96,7 @@ public class EssentialishWarp extends JavaPlugin {
     	getCommand("renwarp").setTabCompleter(renwarp);
     	getCommand("delwarp").setTabCompleter(delwarp);
     	getCommand("warplist").setTabCompleter(warplist);
-    	// getCommand("warpgroup").setTabCompleter(warpgroup);
+    	getCommand("warpgroup").setTabCompleter(warpgroup);
 
          
         getLogger().info("こんちくわーぷ(◎∀◎)");

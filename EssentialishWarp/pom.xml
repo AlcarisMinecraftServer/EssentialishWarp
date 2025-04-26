@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>jp.pgw.kosoado</groupId>
   <artifactId>EssentialishWarp</artifactId>
-  <version>0.9.5</version>
+  <version>0.9.10</version>
   
   <repositories>
     <repository>

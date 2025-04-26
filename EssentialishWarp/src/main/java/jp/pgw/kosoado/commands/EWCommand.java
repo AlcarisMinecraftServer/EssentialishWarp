@@ -28,6 +28,9 @@ public class EWCommand {
 	/** プラグインオブジェクト */
 	protected final EssentialishWarp ew;
 	
+	/** コマンド送信者 */
+	private CommandSender sender;
+	
 	/** yamlのキー(ワープするワールド) */
 	protected final String KEY_WARP_WORLD = "warp.world";
 	/** yamlのキー(ワープするX座標) */
@@ -100,6 +103,24 @@ public class EWCommand {
 	 */
 	protected boolean validate(String input) {
 		return !ForbiddenChars.containsForbiddenChars(input) && !ReservedChars.isReservedChar(input);
+	}
+	
+	
+	/**
+	 * グループフォルダが存在するかどうかチェックを行う
+	 */
+	protected boolean existsGroup(String group) {
+		File groupFile = new File(ew.getDataFolder(), group);
+		return groupFile.exists();
+	}
+	
+	
+	/**
+	 * ワープファイルが存在するかどうかチェックを行う
+	 */
+	protected boolean existsWarpFile(String yamlPath) {
+		File warpFile = new File(ew.getDataFolder(), yamlPath);
+		return warpFile.exists();
 	}
 	
 	
@@ -183,5 +204,20 @@ public class EWCommand {
 		warpPath.append(".yml");
 
 		return warpPath.toString();
+	}
+	
+	
+	/**
+	 * コマンド送信者を取得
+	 */
+	public CommandSender getSender() {
+		return this.sender;
+	}
+	
+	/**
+	 * コマンド送信者を設定
+	 */
+	public void setSender(CommandSender sender) {
+		this.sender = sender;
 	}
 }
