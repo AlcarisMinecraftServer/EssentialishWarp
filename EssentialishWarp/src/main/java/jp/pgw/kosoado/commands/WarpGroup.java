@@ -39,7 +39,20 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 	private final String SUB_COMMAND_SET = "set";
 	
 	/** サブコマンド delete オプション whole */
-	private final String OPTION_WHOLE = "whole";
+	private final String SUB_COMMAND_DELETE_OPTION_WHOLE = "whole";
+	
+	/** サブコマンド create 使用方法 */
+	private final String SUB_COMMAND_CREATE_USAGE = "/warpgroup create <name>";
+	/** サブコマンド delete 使用方法 */
+	private final String SUB_COMMAND_DELETE_USAGE = "/warpgroup delete <name> [whole]";
+	/** サブコマンド list 使用方法 */
+	private final String SUB_COMMAND_LIST_USAGE = "/warpgroup list";
+	/** サブコマンド remove 使用方法 */
+	private final String SUB_COMMAND_REMOVE_USAGE = "/warpgroup remove <name> <warp_name>";
+	/** サブコマンド rename 使用方法 */
+	private final String SUB_COMMAND_RENAME_USAGE = "/warpgroup rename <name> <new_name>";
+	/** サブコマンド set 使用方法 */
+	private final String SUB_COMMAND_SET_USAGE = "/warpgroup set <name> <warp_name>";
 	
 
 	/**
@@ -80,7 +93,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 			if(isList) {
 				
 				if(args.length > 1) {
-					sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
+					sender.sendMessage("§c引数が不正です。\n" + SUB_COMMAND_LIST_USAGE);
 		    		return true;
 				}
 				listGroup();
@@ -100,7 +113,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 				
 				case SUB_COMMAND_CREATE: 
 					if(args.length > 2) {
-						sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
+						sender.sendMessage("§c引数が不正です。\n" + SUB_COMMAND_CREATE_USAGE);
 			    		return true;
 					}
 					createGroup(group);
@@ -110,8 +123,8 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 					boolean isWhole = false;
 					if(args.length == 3) {
 						
-						if(!args[2].equalsIgnoreCase(OPTION_WHOLE)) {
-							sender.sendMessage("§cグループ内ワープごと削除する場合、「whole」を入力してください。\n" + cmd.getUsage());
+						if(!args[2].equalsIgnoreCase(SUB_COMMAND_DELETE_OPTION_WHOLE)) {
+							sender.sendMessage("§cグループ内ワープごと削除する場合、「whole」を入力してください。\n" + SUB_COMMAND_DELETE_USAGE);
 				    		return true;
 						}
 						isWhole = true;
@@ -121,7 +134,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 					
 				case SUB_COMMAND_REMOVE:
 					if(args.length < 3) {
-						sender.sendMessage("§cグループから除去するワープ名を入力してください。\n" + cmd.getUsage());
+						sender.sendMessage("§cグループから除去するワープ名を入力してください。\n" + SUB_COMMAND_REMOVE_USAGE);
 			    		return true;
 					}
 					removeGroup(group, args[2]);
@@ -129,7 +142,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 					
 				case SUB_COMMAND_RENAME:
 					if(args.length < 3) {
-						sender.sendMessage("§c新しく設定するワープグループ名を入力してください。\n" + cmd.getUsage());
+						sender.sendMessage("§c新しく設定するワープグループ名を入力してください。\n" + SUB_COMMAND_RENAME_USAGE);
 			    		return true;
 					}
 					renameGroup(group, args[2]);
@@ -137,7 +150,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 					
 				case SUB_COMMAND_SET:
 					if(args.length < 3) {
-						sender.sendMessage("§cグループを設定するワープ名を入力してください。\n" + cmd.getUsage());
+						sender.sendMessage("§cグループを設定するワープ名を入力してください。\n" + SUB_COMMAND_SET_USAGE);
 			    		return true;
 					}
 					setGroup(group, args[2]);
@@ -220,7 +233,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 			return;
 		}
 	}
@@ -297,6 +310,11 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		 * ・ワープファイルをデータフォルダ直下に移動
 		 * ・warplistを書き換え
 		 */
+		FileConfiguration warplistYaml = ew.getWarplistYaml();
+		if(!warplistYaml.contains(warp)) {
+    		getSender().sendMessage("§a" + warp + " §cは存在しないワープです。");
+    		return;
+    	}
 		
 		File dataFolder = ew.getDataFolder();
 		String yamlPath = createPathString(warp, group);
@@ -305,15 +323,14 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		
 		try {
 			moveWarpFile(warpYamlFile, targetFile);
-			
-			FileConfiguration warplistYaml = ew.getWarplistYaml();
+
 			warplistYaml.set(warp, "");
 			warplistYaml.save(ew.WARPLIST_YAML_FILE);
 			getSender().sendMessage("§a" + group + " §6から " + warp + " を除去しました。");
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 			return;
 		}
 	}
@@ -338,7 +355,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 			return;
 		}
 		
@@ -362,7 +379,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 			return;
 		}
 	}
@@ -398,7 +415,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 		}
 		
 		warplistYaml.set(warp, group);
@@ -408,7 +425,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			getSender().sendMessage(" §c予期せぬエラーが発生しました。");
+			getSender().sendMessage("§c予期せぬエラーが発生しました。");
 			return;
 		}
 	}
@@ -442,7 +459,7 @@ public class WarpGroup extends EWCommand implements CommandExecutor, TabComplete
 			
 			if(args[0].equalsIgnoreCase(SUB_COMMAND_DELETE)) {
 				List<String> whole = new ArrayList<>();
-				whole.add(OPTION_WHOLE);
+				whole.add(SUB_COMMAND_DELETE_OPTION_WHOLE);
 				return whole;
 			}
 			if(args[0].equalsIgnoreCase(SUB_COMMAND_REMOVE)) {
