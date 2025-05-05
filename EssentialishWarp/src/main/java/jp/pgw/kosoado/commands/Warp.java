@@ -1,66 +1,81 @@
 package jp.pgw.kosoado.commands;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import jp.pgw.kosoado.EssentialishWarp;
+import jp.pgw.kosoado.exceptions.SoundNotFoundException;
 import jp.pgw.kosoado.utils.YamlUtil;
 
 /**
- * warpコマンド
+ * ①warpコマンド<br>
+ * 自分または指定したプレイヤーをワープする<br>
+ * ワープ音が設定されていれば、ワープ対象者に再生する<br>
+ * ②silwarpコマンド<br>
+ * 自分または指定したプレイヤーをワープ音なしでワープする<br>
  */
-public class Warp implements CommandExecutor ,Listener {
-	
-	private final EssentialishWarp ew ;
-	
-	//Constructor
-	public Warp(EssentialishWarp _ew) {
-		
-		ew = _ew;
+public class Warp extends EWCommand implements CommandExecutor, TabCompleter {
+
+	/**
+	 * コンストラクタ。
+	 */
+	public Warp(EssentialishWarp ew) {
+		super(ew);
 	}
 	
     @Override
-    public boolean onCommand(CommandSender sender , Command cmd ,
-            String label , String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     	
     	/* arg[0]がなければエラー
-    	 * ymlを読み込んでlocationを取得
+    	 * yamlを読み込んでlocationを取得
+    	 * - warplistからグループを取得
+    	 * - グループ未設定or存在しないグループなら、データフォルダ直下を見る
     	 * 指定したワープがなければ、エラー
     	 * arg[1]があれば、そのプレイヤーをtp
     	 * arg[1]のプレイヤーがいなければ、エラー
     	 * arg[1]がなければ、実行者をtp
     	 * 実行者がプレイヤーでなければ、エラー
+    	 * ワープ音を再生する
     	 */
     	
     	if(args.length == 0) {
-    		sender.sendMessage("§cワープ名は必須です。");
-    		return false;
+    		sender.sendMessage("§cワープ名は必須です。\n" + cmd.getUsage());
+    		return true;
     	}
     	
     	if(args.length > 2) {
-    		sender.sendMessage("§c引数が不正です。");
-    		return false;
+    		sender.sendMessage("§c引数が不正です。\n" + cmd.getUsage());
+    		return true;
     	}
     	
-    	FileConfiguration warpYaml = ew.getWarpYaml();
+    	FileConfiguration warplistYaml = ew.getWarplistYaml();
     	String warpName = args[0];
-    	// String warpPlayer = args[1];
+    	String warpGroup = warplistYaml.getString(warpName);
+    	String yamlPath = createPathString(warpName, warpGroup);
+    	File warpYamlFile = new File(ew.getDataFolder(), yamlPath);
     	
     	try {
+    		FileConfiguration warpYaml = YamlConfiguration.loadConfiguration(warpYamlFile);
     		
-    		World world = Bukkit.getWorld(YamlUtil.getYamlString(warpYaml, warpName + ".world"));
-        	double x = YamlUtil.getYamlDouble(warpYaml, warpName + ".x");
-        	double y = YamlUtil.getYamlDouble(warpYaml, warpName + ".y");
-        	double z = YamlUtil.getYamlDouble(warpYaml, warpName + ".z");
-        	float yaw = (float)( YamlUtil.getYamlDouble(warpYaml, warpName + ".yaw") );
-        	float pitch = (float)( YamlUtil.getYamlDouble(warpYaml, warpName + ".pitch") );
+    		World world = Bukkit.getWorld(YamlUtil.getYamlString(warpYaml, KEY_WARP_WORLD));
+        	double x = YamlUtil.getYamlDouble(warpYaml, KEY_WARP_X);
+        	double y = YamlUtil.getYamlDouble(warpYaml, KEY_WARP_Y);
+        	double z = YamlUtil.getYamlDouble(warpYaml, KEY_WARP_Z);
+        	float yaw = (float)( YamlUtil.getYamlDouble(warpYaml, KEY_WARP_YAW) );
+        	float pitch = (float)( YamlUtil.getYamlDouble(warpYaml, KEY_WARP_PITCH) );
         	
         	Location warpLoc = new Location(world, x, y, z, yaw, pitch);
         	
@@ -70,9 +85,12 @@ public class Warp implements CommandExecutor ,Listener {
         		
         		if(warpPlayer == null) {
         			sender.sendMessage("§c指定したプレイヤーが見つかりませんでした。");
-        			return false;
+        			return true;
         		}
         	}
+        	
+        	// soundをyamlから取り出す
+        	ConfigurationSection sound = warpYaml.getConfigurationSection("sound");
         	
         	if(warpPlayer == null) {
         		
@@ -80,23 +98,40 @@ public class Warp implements CommandExecutor ,Listener {
         			Player player = (Player)sender;
         			player.teleport(warpLoc);
         			player.sendMessage("§a" + warpName + " §6へワープしました。");
-        		
+        			if(cmd.getName().equals("warp")) {
+        				playWarpSound(sender, sound);
+        			}
         		}else {
         			sender.sendMessage("§cプレイヤー名は必須です。");
         		}
         	
         	}else {
         		warpPlayer.teleport(warpLoc);
-        		warpPlayer.sendMessage("§a" + warpName + " §6へワープしました。");
-        		sender.sendMessage("§6" + warpPlayer + " を §a " + warpName + " §6へワープしました。");
+        		if(cmd.getName().equals("warp")) {
+        			playWarpSound(warpPlayer, sound);
+        		}
+        		sender.sendMessage("§6" + warpPlayer.getName() + " を §a " + warpName + " §6へワープしました。");
         	}
         	
-    	} catch(NullPointerException e) {
+    	} catch(NullPointerException | IllegalArgumentException e) {
     		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。");
-    		return false;
-    	} catch(IllegalArgumentException e) {
-    		sender.sendMessage("§a" + warpName + " §cのワープデータが存在しないか、データが不足しています。");
+    		e.printStackTrace();
+    		return true;
+    	} catch(SoundNotFoundException e) {
+    		sender.sendMessage("§a指定したサウンドは存在しません。\n単語の区切りはすべてアンダーバー(_)です。");
     	}
-    	return true ;
+    	return true;
     }
+
+    
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		/*
+		 * warp <warp_name> [<player>]
+		 */
+		if(args.length == 1) return suggestWarps(args[0]);
+		if(args.length == 2) return suggestPlayers(args[1]);
+		return new ArrayList<>();
+	}
 }

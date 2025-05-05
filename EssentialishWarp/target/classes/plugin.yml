@@ -1,5 +1,5 @@
 name: EssentialishWarp
-version: 0.5.0
+version: 0.10.0
 main: jp.pgw.kosoado.EssentialishWarp
 api-version: "1.21.1"
 
@@ -8,18 +8,38 @@ commands:
         aliases: [wp]
         description: warp command
         usage: '/warp <warp_name> [<player>]'
+     silwarp: 
+       aliases: [silwp]
+       description: silent warp command
+       usage: '/silwarp <warp_name> [<player>]'
      setwarp:
         aliases: [setwp]
         description: set warp
-        usage: '/setwarp <warp_name>'
+        usage: '/setwarp <warp_name> <sound_name | off> [<group_name>]'
+     updwarp: 
+       aliases: [updwp]
+       description: update warp command
+       usage: '/updwarp <warp_name> <warp | sound> [<sound_name | off>]'
+     renwarp: 
+       aliases: [renwp]
+       description: rename warp command
+       usage: '/renwarp <warp_name> <new_warp_name>'
      delwarp:
-        aliases: [delwp]
-        description: delete warp
-        usage: '/delwarp <warp_name>'
-     relwarp:
-        aliases: [relwp]
-        description: reload warp
-        usage: '/relwarp'
+       aliases: [delwp]
+       description: delete warp
+       usage: '/delwarp <warp_name>'
+     warplist:
+       aliases: [wplist]
+       description: warp list
+       usage: '/warplist [<reload | group_name>]'
+     warpgroup:
+       aliases: [wpgp]
+       description: warp group operation
+       usage: '/warpgroup <operation> <name> [<value>]'
+     relwarp: 
+       aliases: [relwp]
+       description: reload warplist
+       usage: '/renwarp <warp_name> <new_warp_name>'
         
 permissions:
      EssentialishWarp: 
